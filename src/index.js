@@ -45,6 +45,39 @@ function safeDecode(s) {
   }
 }
 
+function clientIdentifier(request) {
+  return request.headers.get("cf-connecting-ip")
+    || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || "unknown";
+}
+
+function rateLimitKeyForRequest(request) {
+  return `client:${clientIdentifier(request)}`;
+}
+
+async function checkRateLimit(request, env) {
+  if (!env.IMAGE_RATE_LIMITER || typeof env.IMAGE_RATE_LIMITER.limit !== "function") {
+    return null;
+  }
+
+  const { success } = await env.IMAGE_RATE_LIMITER.limit({
+    key: rateLimitKeyForRequest(request),
+  });
+
+  if (success) {
+    return null;
+  }
+
+  return new Response("too many requests", {
+    status: 429,
+    headers: {
+      "Retry-After": "60",
+      "Cache-Control": "private, no-store",
+      ...corsHeaders(request.headers.get("Origin") || "*"),
+    },
+  });
+}
+
 // 解析 BUCKET_MAP（JSON 字符串），失败时返回空对象。
 function parseBucketMap(env) {
   if (!env || typeof env.BUCKET_MAP !== "string") return {};
@@ -160,6 +193,11 @@ export default {
         status: 405,
         headers: corsHeaders(),
       });
+    }
+
+    const rateLimited = await checkRateLimit(request, env);
+    if (rateLimited) {
+      return rateLimited;
     }
 
     const route = resolveRoute(url, env);
