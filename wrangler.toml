@@ -2,6 +2,14 @@ name = "r2-proxy"
 main = "src/index.js"
 compatibility_date = "2026-06-15"
 
+[[ratelimits]]
+name = "IMAGE_RATE_LIMITER"
+namespace_id = "2026061501"
+
+  [ratelimits.simple]
+  limit = 30
+  period = 60
+
 # One Worker bound to 4 R2 buckets.
 [[r2_buckets]]
 binding = "BLUEARCHIVE"
