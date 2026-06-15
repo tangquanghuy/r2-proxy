@@ -2,7 +2,7 @@ name = "r2-proxy"
 main = "src/index.js"
 compatibility_date = "2026-06-15"
 
-# 一个 Worker 绑定 3 个 R2 桶。
+# One Worker bound to 4 R2 buckets.
 [[r2_buckets]]
 binding = "BLUEARCHIVE"
 bucket_name = "bluearchive"
@@ -15,7 +15,11 @@ bucket_name = "dnf"
 binding = "MOSHEN"
 bucket_name = "moshen"
 
-# URL 路径别名 -> 上面 binding 名（JSON 字符串）
+[[r2_buckets]]
+binding = "CATDOG"
+bucket_name = "catdog"
+
+# URL path alias -> binding name
 [vars]
-BUCKET_MAP = '{"bluearchive":"BLUEARCHIVE","dnf":"DNF","moshen":"MOSHEN"}'
+BUCKET_MAP = '{"bluearchive":"BLUEARCHIVE","dnf":"DNF","moshen":"MOSHEN","catdog":"CATDOG"}'
 DEFAULT_ALIAS = "dnf"
