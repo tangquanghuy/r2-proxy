@@ -1,0 +1,21 @@
+name = "r2-proxy"
+main = "src/index.js"
+compatibility_date = "2026-06-15"
+
+# 一个 Worker 绑定 3 个 R2 桶。
+[[r2_buckets]]
+binding = "BLUEARCHIVE"
+bucket_name = "bluearchive"
+
+[[r2_buckets]]
+binding = "DNF"
+bucket_name = "dnf"
+
+[[r2_buckets]]
+binding = "MOSHEN"
+bucket_name = "moshen"
+
+# URL 路径别名 -> 上面 binding 名（JSON 字符串）
+[vars]
+BUCKET_MAP = '{"bluearchive":"BLUEARCHIVE","dnf":"DNF","moshen":"MOSHEN"}'
+DEFAULT_ALIAS = "dnf"
